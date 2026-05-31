@@ -1,0 +1,6 @@
+source/execute_debug.bat
+source/execute_release.bat
+/source/Release
+/source/Debug
+/source/VS2022_solution
+/source/VS2026_solution
