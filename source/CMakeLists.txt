@@ -36,6 +36,12 @@ target_link_libraries(ARKANOID
     sfml-network
 )
 
+add_custom_command(TARGET ARKANOID POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+        "${CMAKE_SOURCE_DIR}/fonts"     
+        "$<TARGET_FILE_DIR:ARKANOID>/fonts" 
+    COMMENT "Copying fonts directory to output folder"
+)
 
 
 if(WIN32)

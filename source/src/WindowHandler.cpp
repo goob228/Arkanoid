@@ -7,7 +7,7 @@ WindowHandler::WindowHandler()
     _width = 500;
     _height = 500;
     createWindow();
-    loadFont("C:/Windows/Fonts/ARIALI.TTF");
+    loadFont("fonts/Regular.ttf");
 }
 
 WindowHandler::WindowHandler(unsigned int const width, unsigned int const height)
@@ -15,7 +15,7 @@ WindowHandler::WindowHandler(unsigned int const width, unsigned int const height
     _width = width;
     _height = height;
     createWindow();
-    loadFont("C:/Windows/Fonts/ARIALI.TTF");
+    loadFont("fonts/Regular.ttf");
 }
 
 
