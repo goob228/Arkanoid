@@ -11,6 +11,7 @@
 #include <random>
 #include <algorithm>
 #include <string>
+#include <cmath>
 
 
 #define THROW_IF_ZERO(value)                                                    \

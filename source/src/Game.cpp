@@ -6,8 +6,9 @@ Game::Game()
     int height = 700;
 
     _running = false;
-    _targetTickRate = 60;
+    _targetTickRate = 120;
     _windowHandler = new WindowHandler(width, height);
+    _playground = new Playground(0, height-width, width, width);
 }
 
 Game::~Game()
@@ -15,6 +16,8 @@ Game::~Game()
     delete _windowHandler;
     _windowHandler = nullptr;
 
+    delete _playground;
+    _playground = nullptr;
 }
 
 
@@ -26,6 +29,10 @@ void Game::respond(std::vector<Event> events)
                 _running = false;
                 break;
             case Event::CLICK_MOUSE:
+                if (_gameState == GameState::RUNNING) {
+                    iVector2 mousePos = EventHandler::getMousePos(_windowHandler);
+                    _playground->_ball._position = fVector2(mousePos.x, mousePos.y);
+                }
                 break;
             case Event::CLICK_ESC:
                 _gameState = (_gameState == GameState::RUNNING) ? GameState::PAUSE : GameState::RUNNING;
@@ -53,21 +60,22 @@ void Game::gameLoop()
 
         render();
         time.wait();
+        _realFps = time._tickPerSec;
     }
 }
 
 void Game::update()
 {
-
+    _playground->update(1.f/float(_targetTickRate));
 }  
 
 void Game::render()
 {
     _windowHandler->fill(GameColor::Gray);
-    std::string mytxt = "Score: " + std::to_string(0) + "\nFPS";
+    std::string mytxt = "Score: " + std::to_string(0) + "\nFPS: " + std::to_string(_realFps);
     _windowHandler->drawText(mytxt,{10.f,10.f});
 
-
+    _playground->draw(_windowHandler);
 
     _windowHandler->display();
 }   
@@ -100,7 +108,9 @@ void Game::Time::wait()
 {
     auto now = std::chrono::steady_clock::now();
     auto elapsed = now - _lastTime;
+    
     _forTPSCheck += elapsed;
+    
     _tickCount++;
     if (_forTPSCheck > _secondDuration){
         _tickPerSec = _tickCount;

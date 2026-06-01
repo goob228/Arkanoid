@@ -32,6 +32,8 @@ namespace GameColor {
     inline const auto Darkgreen = Color(6, 78, 64);
 }
 
+
+
 /*
 namespace Color {
     inline const auto White  = sf::Color::White;

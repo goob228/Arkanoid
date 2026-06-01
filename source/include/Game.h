@@ -5,6 +5,7 @@
 #include "SFMLtypes.h"
 #include "WindowHandler.h"
 #include "EventHandler.h"
+#include "Playground.h"
 
 #include <chrono>
 #include <thread>
@@ -35,14 +36,17 @@ private:
     /*
     * Essentials
     */
+    int _realFps;
     bool _running;
     GameState _gameState;
     unsigned int _targetTickRate;
     WindowHandler* _windowHandler;
     EventHandler _eventHandler;
 
-
-    
+    /*
+    * Arcanoid related
+    */
+    Playground* _playground;
     
 
     class Time {
@@ -53,13 +57,15 @@ private:
 
         void wait();
 
+        int _tickPerSec;
+
     private:
         std::chrono::steady_clock::duration _tickDuration;
         std::chrono::steady_clock::time_point _lastTime;
         std::chrono::steady_clock::duration _secondDuration;
         std::chrono::steady_clock::duration _forTPSCheck;
         int _tickCount;
-        int _tickPerSec;
+        
     };
 
 
