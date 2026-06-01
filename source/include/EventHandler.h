@@ -13,7 +13,9 @@
 enum class Event{
     CLOSE_WINDOW,
     CLICK_MOUSE,
-    CLICK_ESC
+    CLICK_ESC,
+    LEFT_PRESSED,
+    RIGHT_PRESSED
 };
 
 

@@ -1,17 +1,27 @@
 #include "Ball.h"
 
-Ball::Ball()
+Ball::Ball(int const posx, int const posy)
 {
     _radius = 10.f;
-    _direction = fVector2(-1.f/std::sqrt(2.f),1.f/std::sqrt(2.f));
-    _position = fVector2(300.f,300.f);
+    _direction = fVector2(1.f/std::sqrt(2.f),-1.f/std::sqrt(2.f));
+    _position = fVector2(float(posx), float(posy));
     _speed = 300.f;
 
     _shape = CircleShape();
     _shape.setFillColor(Color::White);
     _shape.setRadius(_radius);
-    _shape.setPosition(_position);
+    _shape.setPosition(fVector2(_position.x - _radius, _position.y - _radius));
     
+}
+
+void Ball::addSpeed(float const addspeed)
+{
+    _speed += addspeed;
+}
+
+void Ball::setBoundsCollider(std::shared_ptr<RectCollider> boundsCollider) 
+{
+    _boundsCollider = boundsCollider;
 }
 
 fVector2 reflect(fVector2& incident, fVector2& normal) {
@@ -22,7 +32,7 @@ fVector2 reflect(fVector2& incident, fVector2& normal) {
     );
 }
 
-void Ball::update(float dt, std::vector<std::shared_ptr<RectCollider>> colliders)
+void Ball::update(float const dt, std::vector<std::shared_ptr<RectCollider>> colliders)
 {
     _colliderIds.clear();
     float distance = dt*_speed;
@@ -35,6 +45,7 @@ void Ball::update(float dt, std::vector<std::shared_ptr<RectCollider>> colliders
                 fVector2 normal;
                 float sdf;
                 colliders[id]->sdfWithNormal(_position, normal, sdf);
+                colliders[id]->bounced(this);
                 
                 _position -= normal*(sdf-_radius-1e-6f);
                 _direction = reflect(_direction, normal );
@@ -48,6 +59,8 @@ void Ball::update(float dt, std::vector<std::shared_ptr<RectCollider>> colliders
     }
 
     _shape.setPosition(fVector2(_position.x - _radius, _position.y - _radius));
+
+    checkOutOfBounds();
 }
 
 void Ball::draw(WindowHandler* windowHandler)
@@ -85,19 +98,13 @@ float Ball::circleCast(std::vector<std::shared_ptr<RectCollider>> colliders, flo
     return best;
 }
 
-void Ball::circleSdfs(std::vector<std::shared_ptr<RectCollider>> colliders)
-{
-    for (int i = 0; i < colliders.size(); i++) {
-        fVector2 normal;
-        float sdf;
-        colliders[i]->sdfWithNormal(_position, normal, sdf);
-        if (sdf < _radius) {
-            fVector2 deriv = normal*(-sdf+_radius);
-            _position -= deriv;
-            std::cout << "sdf moved x: " << deriv.x << "  y: " << deriv.y << std::endl;
-        } else {
-            std::cout << "skip sdf" << std::endl;
-        }
 
+void Ball::checkOutOfBounds()
+{
+    if (_boundsCollider) {
+        float dist;
+        _boundsCollider->sdf(_position, dist);
+
+        if (dist - _radius > 0.0f) _onRemove=true;
     }
 }

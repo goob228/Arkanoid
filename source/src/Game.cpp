@@ -31,11 +31,16 @@ void Game::respond(std::vector<Event> events)
             case Event::CLICK_MOUSE:
                 if (_gameState == GameState::RUNNING) {
                     iVector2 mousePos = EventHandler::getMousePos(_windowHandler);
-                    _playground->_ball._position = fVector2(mousePos.x, mousePos.y);
                 }
                 break;
             case Event::CLICK_ESC:
                 _gameState = (_gameState == GameState::RUNNING) ? GameState::PAUSE : GameState::RUNNING;
+                break;
+            case Event::LEFT_PRESSED:
+                _playground->_carriage->moveLeft(_deltaTime);
+                break;
+            case Event::RIGHT_PRESSED:
+                _playground->_carriage->moveRight(_deltaTime);
                 break;
         }
     }
@@ -50,7 +55,9 @@ void Game::gameLoop()
     Time time(_targetTickRate);
     _running = true;
     _gameState = GameState::RUNNING;
+    _deltaTime = 1.f/float(_targetTickRate);
     
+    _playground->initialize();
 
     while (_running) {
         _eventHandler.handleEvents(_windowHandler);
@@ -66,13 +73,13 @@ void Game::gameLoop()
 
 void Game::update()
 {
-    _playground->update(1.f/float(_targetTickRate));
+    _playground->update(_deltaTime);
 }  
 
 void Game::render()
 {
     _windowHandler->fill(GameColor::Gray);
-    std::string mytxt = "Score: " + std::to_string(0) + "\nFPS: " + std::to_string(_realFps);
+    std::string mytxt = "Lives: " + std::to_string(_playground->_lives);
     _windowHandler->drawText(mytxt,{10.f,10.f});
 
     _playground->draw(_windowHandler);

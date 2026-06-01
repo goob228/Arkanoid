@@ -24,6 +24,14 @@ void EventHandler::handleEvents(WindowHandler* const windowHandler)
             }
         }
     }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        _events.push_back(Event::LEFT_PRESSED);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        _events.push_back(Event::RIGHT_PRESSED);
+    }
+
 }
 
 iVector2 EventHandler::getMousePos(WindowHandler* const windowHandler)

@@ -37,6 +37,7 @@ private:
     * Essentials
     */
     int _realFps;
+    float _deltaTime;
     bool _running;
     GameState _gameState;
     unsigned int _targetTickRate;

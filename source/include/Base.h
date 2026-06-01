@@ -24,4 +24,12 @@
         }                                                                       \
     } while(0)
 
+
+
+
+class Base {
+public:
+    inline static std::random_device randomDevice;
+    inline static std::mt19937 generator{randomDevice()};
+};
 #endif

@@ -1,4 +1,5 @@
 #include "RectCollider.h"
+#include "Ball.h"
 
 RectCollider::RectCollider(int const posx, int const posy, int const width, int const height)
 {
@@ -8,9 +9,17 @@ RectCollider::RectCollider(int const posx, int const posy, int const width, int 
 
 }
 
+
+fVector2 RectCollider::getPos()
+{
+    return _position;
+}
+
 // Основная функция проверки движущегося круга
 float RectCollider::movingCircleIntersectsRect(fVector2& center, fVector2& dir, float maxDist, float radius)
 {
+    if (_onRemove) return -1.0f;
+
     // Переводим прямоугольник в центрированные координаты (центр в 0)
     float cx = _position.x;
     float cy = _position.y;
@@ -130,25 +139,110 @@ Block::Block(int const posx, int const posy, int const width, int const height) 
     _shape = RectangleShape();
     _shape.setPosition(fVector2(float(posx), float(posy)));
     _shape.setSize(fVector2(float(width), float(height)));
-    _shape.setFillColor(Color(240, 10, 10, 100));
+    _shape.setFillColor(Color(120, 120, 120, 255));
 
 }
 
 void Block::draw(WindowHandler* windowHandler)
 {
+    if(_onRemove) return;
     windowHandler->drawSquare(_shape);
+}
+
+//////////////////////////////////////////////
+
+RegularBlock::RegularBlock(int const posx, int const posy, int const width, int const height) : Block(posx, posy, width, height)
+{
+    _shape.setFillColor(Color(250, 250, 250, 255));
+}
+
+void RegularBlock::bounced(Ball* ball)
+{
+    if(_onRemove) return;
+    _onRemove = true;
 }
 
 //////////////////////////////////////////////
 
 StrongBlock::StrongBlock(int const posx, int const posy, int const width, int const height) : Block(posx, posy, width, height)
 {
-    
+    _shape.setFillColor(Color(120, 200, 120, 255));
+}
+
+void StrongBlock::bounced(Ball* ball) 
+{
+    if(_onRemove) return;
+    _bouncesCount++;
+    if (_bouncesCount >= _maxBounces) {
+        _onRemove = true;
+    }
 }
 
 //////////////////////////////////////////////
 
 SpeedBlock::SpeedBlock(int const posx, int const posy, int const width, int const height) : Block(posx, posy, width, height)
 {
-    
+    _shape.setFillColor(Color(255, 120, 40, 255));
+
+    _speedAdd = 100.0f;
+}
+
+void SpeedBlock::bounced(Ball* ball)
+{
+    if(_onRemove) return;
+    ball->addSpeed(_speedAdd);
+    _onRemove = true;
+}
+
+//////////////////////////////////////////////
+
+BonusBlock::BonusBlock(int const posx, int const posy, int const width, int const height) : Block(posx, posy, width, height)
+{
+    _shape.setFillColor(Color(120, 120, 255, 255));
+
+    _flag = 1;
+
+}
+
+void BonusBlock::bounced(Ball* ball)
+{
+    if(_onRemove) return;
+    _onRemove = true;
+}
+
+//////////////////////////////////////////////
+
+MoveableBlock::MoveableBlock(int const posx, int const posy, int const width, int const height, float const boundLeft, float const boundRight) 
+: Block(posx, posy, width, height)
+{
+    _shape.setFillColor(Color(255, 40, 255, 255));
+    _speed = 300.0f;
+    _boundLeft = boundLeft;
+    _boundRight = boundRight;
+}
+
+void MoveableBlock::moveLeft(float const dt)
+{
+    _position.x -= _speed*dt;
+    _position.x = std::clamp(_position.x, _boundLeft+_scale.x, _boundRight-_scale.x);
+
+    _shape.setPosition(_position-_scale);
+}
+
+void MoveableBlock::moveRight(float const dt)
+{
+    _position.x += _speed*dt;
+    _position.x = std::clamp(_position.x, _boundLeft+_scale.x, _boundRight-_scale.x);
+    _shape.setPosition(_position-_scale);
+}
+
+void MoveableBlock::setSpeed(float const speed)
+{
+    _speed = speed;
+}
+
+void MoveableBlock::setLength(float const length)
+{
+    _scale.x = length;
+    _shape.setSize(_scale);
 }

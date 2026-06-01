@@ -6,6 +6,7 @@
 
 #include "WindowHandler.h"
 
+class Ball;
 
 
 class RectCollider{
@@ -27,18 +28,20 @@ public:
 
     void sdfWithNormal(fVector2& center, fVector2& normal, float& dist);
 
+    fVector2 getPos();
+
     virtual void draw(WindowHandler* windowHandler){};
 
-    virtual void bounced(){};
-
-protected:
+    virtual void bounced(Ball* ball){};
 
     bool _onRemove = false;
 
+    int _flag = -1;
+
+protected:
+
     fVector2 _position;
     fVector2 _scale;
-
-    
 
 };
 
@@ -58,16 +61,28 @@ protected:
 };
 
 
+class RegularBlock : public Block {
+public:
+
+    RegularBlock(int const posx, int const posy, int const width, int const height);
+
+    void bounced(Ball* ball) override;
+
+private:
+
+};
+
 class StrongBlock : public Block {
 public:
 
     StrongBlock(int const posx, int const posy, int const width, int const height);
 
+    void bounced(Ball* ball) override;
 
 private:
 
     int _bouncesCount = 0;
-    int _maxBounces = 2;
+    int const _maxBounces = 2;
 
 };
 
@@ -76,10 +91,43 @@ public:
 
     SpeedBlock(int const posx, int const posy, int const width, int const height);
 
+    void bounced(Ball* ball) override;
+
 private:
 
-    int _bouncesCount = 0;
-    int _maxBounces = 2;
+    float _speedAdd;
+
+};
+
+class BonusBlock : public Block {
+public:
+
+    BonusBlock(int const posx, int const posy, int const width, int const height);
+
+    void bounced(Ball* ball) override;
+
+    
+
+};
+
+class MoveableBlock : public Block {
+public:
+
+    MoveableBlock(int const posx, int const posy, int const width, int const height, float const boundLeft, float const boundRight);
+
+    void moveLeft(float const dt);
+
+    void moveRight(float const dt);
+
+    void setSpeed(float const speed);
+
+    void setLength(float const length);
+
+private:
+
+    float _speed;
+    float _boundLeft;
+    float _boundRight;
 
 };
 
