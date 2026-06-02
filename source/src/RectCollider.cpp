@@ -153,7 +153,7 @@ void Block::draw(WindowHandler* windowHandler)
 
 RegularBlock::RegularBlock(int const posx, int const posy, int const width, int const height) : Block(posx, posy, width, height)
 {
-    _shape.setFillColor(Color(250, 250, 250, 255));
+    _shape.setFillColor(GameColor::White);
 }
 
 void RegularBlock::bounced(Ball* ball)
@@ -166,7 +166,9 @@ void RegularBlock::bounced(Ball* ball)
 
 StrongBlock::StrongBlock(int const posx, int const posy, int const width, int const height) : Block(posx, posy, width, height)
 {
-    _shape.setFillColor(Color(120, 200, 120, 255));
+    _shape.setFillColor(GameColor::Green);
+
+    _flag = 2;
 }
 
 void StrongBlock::bounced(Ball* ball) 
@@ -182,7 +184,7 @@ void StrongBlock::bounced(Ball* ball)
 
 SpeedBlock::SpeedBlock(int const posx, int const posy, int const width, int const height) : Block(posx, posy, width, height)
 {
-    _shape.setFillColor(Color(255, 120, 40, 255));
+    _shape.setFillColor(GameColor::Red);
 
     _speedAdd = 100.0f;
 }
@@ -198,7 +200,7 @@ void SpeedBlock::bounced(Ball* ball)
 
 BonusBlock::BonusBlock(int const posx, int const posy, int const width, int const height) : Block(posx, posy, width, height)
 {
-    _shape.setFillColor(Color(120, 120, 255, 255));
+    _shape.setFillColor(GameColor::Blue);
 
     _flag = 1;
 
@@ -215,7 +217,7 @@ void BonusBlock::bounced(Ball* ball)
 MoveableBlock::MoveableBlock(int const posx, int const posy, int const width, int const height, float const boundLeft, float const boundRight) 
 : Block(posx, posy, width, height)
 {
-    _shape.setFillColor(Color(255, 40, 255, 255));
+    _shape.setFillColor(GameColor::Magenta);
     _speed = 300.0f;
     _boundLeft = boundLeft;
     _boundRight = boundRight;
@@ -244,5 +246,22 @@ void MoveableBlock::setSpeed(float const speed)
 void MoveableBlock::setLength(float const length)
 {
     _scale.x = length;
-    _shape.setSize(_scale);
+    _shape.setSize(_scale*2.0f);
+    _shape.setPosition(_position-_scale);
+}
+
+float MoveableBlock::getSpeed()
+{
+    return _speed;
+}
+
+float MoveableBlock::getLength()
+{
+    return _scale.x;
+}
+
+void MoveableBlock::bounced(Ball* ball)
+{
+    float factor = (ball->_position.x - _position.x)/(4.0f*_scale.x);
+    ball->addDirection(fVector2(factor, 0.0f));
 }

@@ -23,6 +23,7 @@ Playground::~Playground()
 
 void Playground::initialize() 
 {
+    _placedTexts.clear();
     _balls.clear();
     _bonuses.clear();
     _blocks.clear();
@@ -88,8 +89,9 @@ void Playground::addBall()
 
 void Playground::addBonus(int const posx, int const posy)
 {
-    std::uniform_int_distribution<> typeDistribution(0, 3);
+    std::uniform_int_distribution<> typeDistribution(0, 5);
     int bonusType = typeDistribution(Base::generator);
+
 
     if (bonusType == 0) {
         auto bonus = std::make_unique<BallBonus>(posx, posy);
@@ -99,8 +101,30 @@ void Playground::addBonus(int const posx, int const posy)
         auto bonus = std::make_unique<BottomBonus>(posx, posy);
         bonus->setBoundsCollider(_boundsPlayground);
         _bonuses.push_back(std::move(bonus));
+    } else if (bonusType == 2) {
+        auto bonus = std::make_unique<CarriageSpeedBonus>(posx, posy);
+        bonus->setBoundsCollider(_boundsPlayground);
+        _bonuses.push_back(std::move(bonus));
+    } else if (bonusType == 3) {
+        auto bonus = std::make_unique<CarriageLengthBonus>(posx, posy);
+        bonus->setBoundsCollider(_boundsPlayground);
+        _bonuses.push_back(std::move(bonus));
+    } else if (bonusType == 4) {
+        auto bonus = std::make_unique<BallDirBonus>(posx, posy);
+        bonus->setBoundsCollider(_boundsPlayground);
+        _bonuses.push_back(std::move(bonus));
+    } else if (bonusType == 5) {
+        auto bonus = std::make_unique<BallSpeedBonus>(posx, posy);
+        bonus->setBoundsCollider(_boundsPlayground);
+        _bonuses.push_back(std::move(bonus));
     }
+    
+}
 
+void Playground::addPlacedText(std::string const & txt, fVector2 const pos)
+{
+    auto placedtext = std::make_unique<PlacedText>(txt, pos);
+    _placedTexts.push_back(std::move(placedtext));
 }
 
 void Playground::checkCarriageBonuses()
@@ -109,7 +133,9 @@ void Playground::checkCarriageBonuses()
         float dist;
         _carriage->sdf(bonus->_position, dist);
         if (dist-bonus->_radius < 0.0f) {
+            if (!bonus->_onRemove) addPlacedText(bonus->_name, bonus->_position);
             bonus->touched(this);
+            
         }
     }
 }
@@ -117,6 +143,11 @@ void Playground::checkCarriageBonuses()
 
 void Playground::update(float const dt)
 {
+
+    //////////////// мячи
+    if (_lives == 0) {
+        initialize();
+    }
     
     for (auto it = _balls.begin(); it != _balls.end(); ) {
         if ((*it)->_onRemove) {
@@ -138,6 +169,8 @@ void Playground::update(float const dt)
             if ((*it)->_flag == 1) {
                 fVector2 itspos = (*it)->getPos();
                 addBonus(int(itspos.x), int(itspos.y));
+            } else if ((*it)->_flag == 2) {
+                _lives++;
             }
             it = _blocks.erase(it); 
         } else {
@@ -154,6 +187,18 @@ void Playground::update(float const dt)
             it = _bonuses.erase(it); 
         } else {
             (*it)->update(dt);
+            ++it;
+        }
+    }
+
+    //////////// тексты
+    
+    for (auto it = _placedTexts.begin(); it != _placedTexts.end(); ) {
+        if ((*it)->_onRemove) {
+            
+            it = _placedTexts.erase(it); 
+        } else {
+            (*it)->update();
             ++it;
         }
     }
@@ -176,6 +221,10 @@ void Playground::draw(WindowHandler* windowHandler)
 
     for (const auto& bonus : _bonuses) {
         bonus->draw(windowHandler);
+    }
+
+    for (const auto& placedtext : _placedTexts) {
+        placedtext->draw(windowHandler);
     }
 
 }

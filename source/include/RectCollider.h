@@ -1,6 +1,13 @@
 #ifndef RECTCOLLIDER_H
 #define RECTCOLLIDER_H
 
+//////////////////////////////////////////////////////
+//
+//  Здесь RectCollider и все виды блоков, наследующие 
+//  от RectCollider
+//
+//////////////////////////////////////////////////////
+
 #include "Base.h"
 #include "SFMLtypes.h"
 
@@ -79,10 +86,12 @@ public:
 
     void bounced(Ball* ball) override;
 
+    int const _maxBounces = 2;
+
 private:
 
     int _bouncesCount = 0;
-    int const _maxBounces = 2;
+    
 
 };
 
@@ -122,6 +131,12 @@ public:
     void setSpeed(float const speed);
 
     void setLength(float const length);
+
+    float getSpeed();
+
+    float getLength();
+
+    void bounced(Ball* ball) override;
 
 private:
 

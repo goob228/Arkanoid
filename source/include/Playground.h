@@ -1,6 +1,12 @@
 #ifndef PLAYGROUND_H
 #define PLAYGROUND_H
 
+//////////////////////////////////////////////////////
+//
+//  Основная логика игры и взаимодействия находится тут
+//
+//////////////////////////////////////////////////////
+
 #include "Base.h"
 #include "SFMLtypes.h"
 #include "WindowHandler.h"
@@ -13,6 +19,9 @@ class Playground{
 
 friend class BallBonus;
 friend class BottomBonus;
+friend class BallDirBonus;
+friend class BallSpeedBonus;
+
 
 public:
 
@@ -34,6 +43,8 @@ private:
     void addBall();
 
     void addBonus(int const posx, int const posy);
+
+    void addPlacedText(std::string const & txt, fVector2 const pos);
     
     void checkCarriageBonuses();
 
@@ -46,6 +57,7 @@ private:
     int _width;
     int _height;
 
+    std::vector<std::unique_ptr<PlacedText>> _placedTexts;
     std::vector<std::unique_ptr<Ball>> _balls;
     std::vector<std::unique_ptr<Bonus>> _bonuses;
     std::vector<std::shared_ptr<RectCollider>> _blocks;

@@ -25,10 +25,10 @@ void EventHandler::handleEvents(WindowHandler* const windowHandler)
         }
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
         _events.push_back(Event::LEFT_PRESSED);
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
         _events.push_back(Event::RIGHT_PRESSED);
     }
 

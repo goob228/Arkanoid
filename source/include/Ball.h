@@ -1,6 +1,12 @@
 #ifndef BALL_H
 #define BALL_H
 
+//////////////////////////////////////////////////////
+//
+//  Здесь Ball - мячик
+//
+//////////////////////////////////////////////////////
+
 #include "Base.h"
 #include "SFMLtypes.h"
 #include "WindowHandler.h"
@@ -10,6 +16,7 @@
 
 class Ball{
 
+friend class MoveableBlock;
 
 public:
 
@@ -21,9 +28,11 @@ public:
 
     void addSpeed(float const addspeed);    
 
+    void addDirection(fVector2 const ddir);  
+
     void setBoundsCollider(std::shared_ptr<RectCollider> boundsCollider);
 
-    void setRandomAngle();
+    void setRandomDirection();
 
     bool _onRemove = false;
 

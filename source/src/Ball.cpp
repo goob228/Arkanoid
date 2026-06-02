@@ -1,11 +1,14 @@
 #include "Ball.h"
 
+#define TORADIANS(value)  value*0.01745329251f
+
 Ball::Ball(int const posx, int const posy)
 {
     _radius = 10.f;
-    _direction = fVector2(1.f/std::sqrt(2.f),-1.f/std::sqrt(2.f));
     _position = fVector2(float(posx), float(posy));
     _speed = 300.f;
+
+    setRandomDirection();
 
     _shape = CircleShape();
     _shape.setFillColor(Color::White);
@@ -19,9 +22,32 @@ void Ball::addSpeed(float const addspeed)
     _speed += addspeed;
 }
 
+bool areSimilarAbsolute(float a, float b, float epsilon = 1e-6f) {
+    return std::fabs(a - b) <= epsilon;
+}
+
+void Ball::addDirection(fVector2 const ddir)
+{
+    _direction += ddir;
+    float length = std::sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
+    if (areSimilarAbsolute(length, 0.0f)) {
+        setRandomDirection();
+    } else {
+        _direction /= length;
+    }
+}
+
 void Ball::setBoundsCollider(std::shared_ptr<RectCollider> boundsCollider) 
 {
     _boundsCollider = boundsCollider;
+}
+
+void Ball::setRandomDirection()
+{
+    std::uniform_int_distribution<> typeDistribution(210, 330);
+    int angle = typeDistribution(Base::generator);
+    float rad = TORADIANS(float(angle)); 
+    _direction = fVector2(std::cos(rad),std::sin(rad));
 }
 
 fVector2 reflect(fVector2& incident, fVector2& normal) {
@@ -39,16 +65,17 @@ void Ball::update(float const dt, std::vector<std::shared_ptr<RectCollider>> col
     for (int i = 0; i < 5; i++) {
         float best = circleCast(colliders, distance);
         if (best >= 0.0f) {
+            bool made = false;
             for (const auto& id : _colliderIds) {
                 distance -= best;
                 _position += _direction*best;
                 fVector2 normal;
                 float sdf;
                 colliders[id]->sdfWithNormal(_position, normal, sdf);
-                colliders[id]->bounced(this);
-                
                 _position -= normal*(sdf-_radius-1e-6f);
-                _direction = reflect(_direction, normal );
+                if (!made) _direction = reflect(_direction, normal );
+                made = true;
+                colliders[id]->bounced(this);
             }
             _colliderIds.clear();
                 
@@ -66,10 +93,6 @@ void Ball::update(float const dt, std::vector<std::shared_ptr<RectCollider>> col
 void Ball::draw(WindowHandler* windowHandler)
 {
     windowHandler->drawCircle(_shape);
-}
-
-bool areSimilarAbsolute(float a, float b, float epsilon = 1e-6f) {
-    return std::fabs(a - b) <= epsilon;
 }
 
 float Ball::circleCast(std::vector<std::shared_ptr<RectCollider>> colliders, float distance)

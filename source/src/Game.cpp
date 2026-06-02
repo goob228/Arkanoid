@@ -2,8 +2,8 @@
 
 Game::Game()
 {
-    int width = 600;
-    int height = 700;
+    int width = 750;
+    int height = 800;
 
     _running = false;
     _targetTickRate = 120;

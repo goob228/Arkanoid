@@ -26,7 +26,7 @@
 
 
 
-
+///////////// Нужно чтобы во всём проекте был общий генератор
 class Base {
 public:
     inline static std::random_device randomDevice;
