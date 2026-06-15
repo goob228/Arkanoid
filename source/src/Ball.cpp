@@ -1,7 +1,7 @@
 #include "Ball.h"
 
 #define TORADIANS(value)  value*0.01745329251f
-
+//pidr
 Ball::Ball(int const posx, int const posy)
 {
     _radius = 10.f;
